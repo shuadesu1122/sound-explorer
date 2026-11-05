@@ -306,6 +306,28 @@ input[type=range]{height:clamp(20px,3dvh,27px)}
  .paramList{gap:3px!important}
  .param{min-height:29px!important}
 }
+/* v57: mobile visualization-first sizing */
+@media (max-width:600px){
+ .app{gap:6px!important;padding-top:calc(7px + env(safe-area-inset-top))!important}
+ .graphs{height:490px!important;min-height:490px!important;grid-template-rows:minmax(0,1.35fr) minmax(0,1fr)!important;gap:8px!important}
+ .subs{height:180px!important;min-height:180px!important;gap:8px!important}
+ .mainGraph,.sub{padding:4px 6px!important}
+ .graphHead,.sub .graphHead{height:21px!important;min-height:21px!important;flex-basis:21px!important}
+ .params{padding:6px 9px 7px!important}
+ .paramTop{min-height:18px!important;margin-bottom:3px!important}
+ .paramList{gap:2px!important}
+ .param{min-height:28px!important}
+ .paramLabel{font-size:10px!important;margin-bottom:0!important}
+ input[type=range]{height:22px!important}
+ .tab{padding:7px 8px!important}
+ .transport{min-height:38px!important}
+ .bottom{padding-top:5px!important}
+ .paramList.comparePanel{gap:5px!important}
+}
+@media (max-width:600px) and (max-height:740px){
+ .graphs{height:430px!important;min-height:430px!important}
+ .subs{height:155px!important;min-height:155px!important}
+}
 /* v56: consistent delicate slider tracks across all parameter rows */
 .param input[type="range"]::-webkit-slider-runnable-track{height:1px!important;background:#777!important;border:0!important;box-shadow:none!important}
 .param input[type="range"]::-moz-range-track{height:1px!important;background:#777!important;border:0!important;box-shadow:none!important}
