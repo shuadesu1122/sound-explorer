@@ -495,6 +495,15 @@ input[type=range]{height:21px}
  .transport .note{position:static!important;grid-column:2!important;left:auto!important;top:auto!important;transform:none!important;justify-self:center!important;margin:0!important;width:70px!important;min-width:70px!important;max-width:70px!important;z-index:auto!important}
  .transport #exportWav{grid-column:3!important;justify-self:end!important;margin:0!important;min-width:0!important;padding:7px 7px!important;font-size:10px!important}
 }
+/* Mobile fine-tuning: bring transport controls inward while preserving A4 center. */
+@media (max-width:600px){
+ .transport{width:min(100%,310px)!important;max-width:310px!important;align-self:center!important;margin-left:auto!important;margin-right:auto!important;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr)!important;column-gap:5px!important}
+ .transport .playControls{justify-self:start!important}
+ .transport #exportWav{justify-self:end!important}
+ /* Very small reduction in parameter space, without crowding the sliders. */
+ .params{padding-top:4px!important;padding-bottom:5px!important}
+ .paramList:not(.comparePanel){gap:3px!important;padding-bottom:2px!important}
+}
 /* Keep the PARAMETERS dropdown arrow monochrome on iPhone/Safari. */
 .paramTop #addParam{color:#222!important;-webkit-text-fill-color:#222!important;appearance:none;-webkit-appearance:none;background:transparent!important;border-color:#222!important}
 .paramTop #addParam svg,.paramTop #addParam svg path{color:#222!important;stroke:#222!important}
@@ -946,7 +955,7 @@ tabs();renderParams();renderSlots();$('graph0').parentElement.classList.add('rea
   const base=graph.getBoundingClientRect().height;
   const r=note.getBoundingClientRect();
   const vv=window.visualViewport;
-  const center=(vv?vv.offsetTop+vv.height/2:window.innerHeight/2);
+  const center=(vv?vv.offsetTop+vv.height/2:window.innerHeight/2)+4;
   const noteCenter=r.top+r.height/2;
   // Increasing graph height moves the following transport (and its note) down.
   const desired=Math.max(160,base+center-noteCenter);
