@@ -295,7 +295,7 @@ for(let oct=2;oct<=6;oct++)for(let name of ['C','C♯','D','D♯','E','F','F♯'
 function tabs(){ $('tabs').innerHTML=[...Object.keys(defs),'COMPARE'].map(k=>`<button class="tab ${category===k?'active':''}" data-tab="${k}">${k}</button>`).join('');document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{closeDropdown();category=b.dataset.tab;tabs();renderParams()})}
 function renderParams(){if(category==='COMPARE'){renderCompareTab();return;}document.querySelector('.paramTop').style.display='flex';$('paramList').classList.remove('comparePanel');let list=(customShown[category]||defs[category].slice(0,5).map(d=>d[0])).slice(0,5);$('paramList').innerHTML=list.map(id=>{let d=byId[id];return `<div class="param"><div class="paramLabel"><span>${d[1]} <small>（${d[2]}）</small></span><output id="v_${id}">${vals[id]} ${d[6]}</output></div><input aria-label="${d[1]}" type="range" min="${d[3]}" max="${d[4]}" step="${id==='contact'?0.1:1}" value="${vals[id]}" data-param="${id}"></div>`}).join('');document.querySelectorAll('[data-param]').forEach(el=>el.oninput=()=>{let id=el.dataset.param;vals[id]=+el.value;lastWave=null;spectrumFinished=false;$('v_'+id).textContent=vals[id]+' '+byId[id][6];renderGraphs()})}
 const memoTexts={1:'',2:''};try{memoTexts[1]=localStorage.getItem('soundExplorerMemo1')||'';memoTexts[2]=localStorage.getItem('soundExplorerMemo2')||''}catch(e){}
-function renderSlots(){for(let i=1;i<=2;i++){let el=$('slot'+i);if(graphs[i]==='memo'){el.className='sub memoSlot';el.innerHTML=`<div class="graphHead"><button class="graphSelect" data-graph="${i}">メモ ▾</button></div><textarea class="memoEditor" id="memo${i}" placeholder="ここに文章を入力できます" aria-label="メモ"></textarea>`;el.querySelector('textarea').value=memoTexts[i]||'';el.querySelector('textarea').addEventListener('input',e=>{memoTexts[i]=e.target.value;try{localStorage.setItem('soundExplorerMemo'+i,e.target.value)}catch(err){}})}else if(graphs[i]){el.className='sub';el.innerHTML=`<div class="graphHead"><button class="graphSelect" data-graph="${i}">${graphNames[graphs[i]]} <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><canvas id="graph${i}"></canvas>`}else{el.className='sub empty';el.innerHTML=`<button data-graph="${i}">＋ SUB ${i} を追加</button>`}}$('mainLabel').innerHTML=graphNames[graphs[0]]+' <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';document.querySelectorAll('[data-graph]').forEach(b=>b.onclick=()=>openGraph(+b.dataset.graph));renderGraphs()}
+function renderSlots(){for(let i=1;i<=2;i++){let el=$('slot'+i);if(graphs[i]==='memo'){el.className='sub memoSlot';el.innerHTML=`<div class="graphHead"><button class="graphSelect" data-graph="${i}">メモ <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><textarea class="memoEditor" id="memo${i}" placeholder="ここに文章を入力できます" aria-label="メモ"></textarea>`;el.querySelector('textarea').value=memoTexts[i]||'';el.querySelector('textarea').addEventListener('input',e=>{memoTexts[i]=e.target.value;try{localStorage.setItem('soundExplorerMemo'+i,e.target.value)}catch(err){}})}else if(graphs[i]){el.className='sub';el.innerHTML=`<div class="graphHead"><button class="graphSelect" data-graph="${i}">${graphNames[graphs[i]]} <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><canvas id="graph${i}"></canvas>`}else{el.className='sub empty';el.innerHTML=`<button data-graph="${i}">＋ SUB ${i} を追加</button>`}}$('mainLabel').innerHTML=graphNames[graphs[0]]+' <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';document.querySelectorAll('[data-graph]').forEach(b=>b.onclick=()=>openGraph(+b.dataset.graph));renderGraphs()}
 function openModal(title,body){$('sheetTitle').textContent=title;$('sheetBody').innerHTML=body;$('overlay').classList.add('show')};function closeModal(){$('overlay').classList.remove('show')};$('close').onclick=closeModal;$('overlay').onclick=e=>{if(e.target===$('overlay'))closeModal()};
 const dropdown=$('dropdown');let dropdownAnchor=null;
 function closeDropdown(){dropdown.hidden=true;dropdown.innerHTML='';dropdownAnchor=null;}
@@ -472,11 +472,36 @@ async function exportWav(){
   const link=document.createElement('a');
   const selected=$('note').selectedOptions[0]?.textContent||'Note';
   const noteName=selected.replace(/♯/g,'sharp').replace(/[^a-zA-Z0-9_-]/g,'');
-  link.href=url;link.download='SoundExplorer_'+noteName+'.wav';
-  document.body.appendChild(link);link.click();link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  const filename='SoundExplorer_'+noteName+'.wav';
+  link.href=url;link.download=filename;
+  // iOS Safari may ignore a programmatic download after async rendering.
+  // Offer a visible, user-tappable file link and a native share-sheet action.
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(isIOS){
+   showWavSaveSheet(blob,url,filename);
+  }else{
+   document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }
  }catch(error){alert('WAV保存に失敗しました: '+error.message)}
  finally{button.disabled=false;button.textContent='WAV保存'}
+}
+function showWavSaveSheet(blob,url,filename){
+ const previous=document.getElementById('wavSaveSheet');if(previous)previous.remove();
+ const backdrop=document.createElement('div');backdrop.id='wavSaveSheet';
+ backdrop.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.43);display:flex;align-items:flex-end;justify-content:center;padding:16px;box-sizing:border-box';
+ const panel=document.createElement('div');panel.style.cssText='width:min(100%,420px);box-sizing:border-box;background:#faf9f6;color:#222;border-radius:16px;padding:22px 20px 20px;font:14px/1.65 Arial,sans-serif;box-shadow:0 12px 36px #0003';
+ const heading=document.createElement('div');heading.textContent='WAVファイルの保存';heading.style.cssText='font-weight:600;font-size:17px;margin-bottom:8px';panel.appendChild(heading);
+ const hint=document.createElement('p');hint.textContent='iPhoneでは下の「共有して保存」を押して「ファイルに保存」を選んでください。共有できない場合は「WAVを開く」を長押しして保存できます。';hint.style.cssText='margin:0 0 14px';panel.appendChild(hint);
+ const styleButton=el=>{el.style.cssText='display:block;box-sizing:border-box;width:100%;text-align:center;border:1px solid #333;border-radius:9px;background:transparent;color:#222;padding:11px 8px;margin-top:9px;font:14px Arial,sans-serif;text-decoration:none;cursor:pointer'};
+ const share=document.createElement('button');share.type='button';share.textContent='共有して保存';styleButton(share);share.style.background='#222';share.style.color='#fff';
+ const file=new File([blob],filename,{type:'audio/wav'});
+ const canShare=!!navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}));
+ if(canShare){share.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e.name!=='AbortError')alert('共有できませんでした。「WAVを開く」を試してください。')}};panel.appendChild(share)}
+ const open=document.createElement('a');open.href=url;open.target='_blank';open.rel='noopener';open.download=filename;open.textContent='WAVを開く・保存';styleButton(open);panel.appendChild(open);
+ const audio=document.createElement('audio');audio.controls=true;audio.src=url;audio.style.cssText='display:block;width:100%;margin-top:14px';panel.appendChild(audio);
+ const close=document.createElement('button');close.type='button';close.textContent='閉じる';styleButton(close);close.onclick=()=>{audio.pause();backdrop.remove();setTimeout(()=>URL.revokeObjectURL(url),120000)};panel.appendChild(close);
+ backdrop.onclick=e=>{if(e.target===backdrop)close.click()};backdrop.appendChild(panel);document.body.appendChild(backdrop);
 }
 $('exportWav').onclick=exportWav;
 
