@@ -280,6 +280,32 @@ input[type=range]{height:clamp(20px,3dvh,27px)}
  .sheet{max-height:90dvh;overflow-y:auto}
 }
 @media (max-width: 350px){.app{padding-left:10px;padding-right:10px}.compareSlots{gap:7px}.compareSlot button{font-size:10px}}
+/* Mobile graph-priority layout: larger plots, denser parameter controls. */
+@media (max-width:600px){
+ .app{gap:8px;padding-top:calc(9px + env(safe-area-inset-top));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+ .graphs{height:405px!important;min-height:405px!important;gap:7px!important}
+ .subs{height:142px!important;min-height:142px!important}
+ .transport{min-height:43px}
+ .playControls button{width:38px!important;height:38px!important;min-width:38px}
+ .tab{padding:9px 8px;min-width:72px}
+ .params{min-height:0!important;padding:8px 11px 10px!important}
+ .paramTop{min-height:20px!important;margin-bottom:5px!important}
+ .paramList{gap:5px!important}
+ .param{min-height:32px!important}
+ .paramLabel{font-size:11px!important;margin-bottom:0!important}
+ input[type=range]{height:25px!important}
+ input[type=range]::-webkit-slider-thumb{width:20px;height:20px;margin-top:-9.5px}
+ .bottom{padding-top:7px}
+ .paramList.comparePanel{gap:7px!important;padding:5px 2px!important}
+ .compareSlot{grid-template-rows:40px 36px 36px;gap:5px}
+ .compareSlot button{height:36px;min-height:36px}
+}
+@media (max-width:600px) and (max-height:740px){
+ .graphs{height:clamp(315px,51dvh,370px)!important;min-height:315px!important}
+ .subs{height:115px!important;min-height:115px!important}
+ .paramList{gap:3px!important}
+ .param{min-height:29px!important}
+}
 /* v56: consistent delicate slider tracks across all parameter rows */
 .param input[type="range"]::-webkit-slider-runnable-track{height:1px!important;background:#777!important;border:0!important;box-shadow:none!important}
 .param input[type="range"]::-moz-range-track{height:1px!important;background:#777!important;border:0!important;box-shadow:none!important}
@@ -533,31 +559,18 @@ async function exportWav(){
    view.setInt16(44+i*2,value<0?Math.round(value*32768):Math.round(value*32767),true);
   }
   const blob=new Blob([bytes],{type:'audio/wav'});
-  const url=URL.createObjectURL(blob);
   const selected=$('note').selectedOptions[0]?.textContent||'Note';
   const noteName=selected.replace(/♯/g,'sharp').replace(/[^a-zA-Z0-9_-]/g,'');
   const filename='SoundExplorer_'+noteName+'.wav';
-  // Explicit save controls, even in iOS preview apps that hide their user agent.
-  showWavSaveSheet(blob,url,filename);
+  const file=new File([blob],filename,{type:'audio/wav'});
+  if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+   try{await navigator.share({files:[file]})}
+   catch(error){if(error.name!=='AbortError')alert('共有できませんでした。Safariで開いてもう一度試してください。')}
+  }else{
+   alert('このブラウザではWAVの共有が使えません。iPhoneのSafariでサイトを開いてください。');
+  }
  }catch(error){alert('WAV作成に失敗しました: '+error.message)}
  finally{button.disabled=false;button.textContent='WAV保存'}
-}
-function showWavSaveSheet(blob,url,filename){
- const previous=document.getElementById('wavSaveSheet');if(previous)previous.remove();
- const backdrop=document.createElement('div');backdrop.id='wavSaveSheet';
- backdrop.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.43);display:flex;align-items:flex-end;justify-content:center;padding:16px;box-sizing:border-box';
- const panel=document.createElement('div');panel.style.cssText='width:min(100%,420px);box-sizing:border-box;background:#faf9f6;color:#222;border-radius:16px;padding:22px 20px 20px;font:14px/1.65 Arial,sans-serif;box-shadow:0 12px 36px #0003';
- const heading=document.createElement('div');heading.textContent='WAVファイルの保存';heading.style.cssText='font-weight:600;font-size:17px;margin-bottom:8px';panel.appendChild(heading);
- const hint=document.createElement('p');hint.textContent='「共有して保存」を押して、iPhoneの共有メニューから「ファイルに保存」を選んでください。';hint.style.cssText='margin:0 0 14px';panel.appendChild(hint);
- const styleButton=el=>{el.style.cssText='display:block;box-sizing:border-box;width:100%;text-align:center;border:1px solid #333;border-radius:9px;background:transparent;color:#222;padding:11px 8px;margin-top:9px;font:14px Arial,sans-serif;text-decoration:none;cursor:pointer'};
- const share=document.createElement('button');share.type='button';share.textContent='共有して保存';styleButton(share);share.style.background='#222';share.style.color='#fff';
- const file=new File([blob],filename,{type:'audio/wav'});
- const canShare=!!navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}));
- if(canShare){share.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e.name!=='AbortError')alert('共有できませんでした。Safariで開いてもう一度試してください。')}};panel.appendChild(share)}else{const notice=document.createElement('p');notice.textContent='この画面では共有機能が使えません。Safariでサイトを開いてください。';panel.appendChild(notice)}
-
- const audio=document.createElement('audio');audio.controls=true;audio.src=url;audio.style.cssText='display:block;width:100%;margin-top:14px';panel.appendChild(audio);
- const close=document.createElement('button');close.type='button';close.textContent='閉じる';styleButton(close);close.onclick=()=>{audio.pause();backdrop.remove();setTimeout(()=>URL.revokeObjectURL(url),120000)};panel.appendChild(close);
- backdrop.onclick=e=>{if(e.target===backdrop)close.click()};backdrop.appendChild(panel);document.body.appendChild(backdrop);
 }
 $('exportWav').onclick=exportWav;
 
