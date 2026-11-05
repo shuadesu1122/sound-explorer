@@ -548,13 +548,13 @@ function showWavSaveSheet(blob,url,filename){
  backdrop.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.43);display:flex;align-items:flex-end;justify-content:center;padding:16px;box-sizing:border-box';
  const panel=document.createElement('div');panel.style.cssText='width:min(100%,420px);box-sizing:border-box;background:#faf9f6;color:#222;border-radius:16px;padding:22px 20px 20px;font:14px/1.65 Arial,sans-serif;box-shadow:0 12px 36px #0003';
  const heading=document.createElement('div');heading.textContent='WAVファイルの保存';heading.style.cssText='font-weight:600;font-size:17px;margin-bottom:8px';panel.appendChild(heading);
- const hint=document.createElement('p');hint.textContent='iPhoneでは下の「共有して保存」を押して「ファイルに保存」を選んでください。共有できない場合は「WAVを開く」を長押しして保存できます。';hint.style.cssText='margin:0 0 14px';panel.appendChild(hint);
+ const hint=document.createElement('p');hint.textContent='「共有して保存」を押して、iPhoneの共有メニューから「ファイルに保存」を選んでください。';hint.style.cssText='margin:0 0 14px';panel.appendChild(hint);
  const styleButton=el=>{el.style.cssText='display:block;box-sizing:border-box;width:100%;text-align:center;border:1px solid #333;border-radius:9px;background:transparent;color:#222;padding:11px 8px;margin-top:9px;font:14px Arial,sans-serif;text-decoration:none;cursor:pointer'};
  const share=document.createElement('button');share.type='button';share.textContent='共有して保存';styleButton(share);share.style.background='#222';share.style.color='#fff';
  const file=new File([blob],filename,{type:'audio/wav'});
  const canShare=!!navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}));
- if(canShare){share.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e.name!=='AbortError')alert('共有できませんでした。「WAVを開く」を試してください。')}};panel.appendChild(share)}
- const open=document.createElement('a');open.href=url;open.target='_blank';open.rel='noopener';open.download=filename;open.textContent='WAVを開く・保存';styleButton(open);panel.appendChild(open);
+ if(canShare){share.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e.name!=='AbortError')alert('共有できませんでした。Safariで開いてもう一度試してください。')}};panel.appendChild(share)}else{const notice=document.createElement('p');notice.textContent='この画面では共有機能が使えません。Safariでサイトを開いてください。';panel.appendChild(notice)}
+
  const audio=document.createElement('audio');audio.controls=true;audio.src=url;audio.style.cssText='display:block;width:100%;margin-top:14px';panel.appendChild(audio);
  const close=document.createElement('button');close.type='button';close.textContent='閉じる';styleButton(close);close.onclick=()=>{audio.pause();backdrop.remove();setTimeout(()=>URL.revokeObjectURL(url),120000)};panel.appendChild(close);
  backdrop.onclick=e=>{if(e.target===backdrop)close.click()};backdrop.appendChild(panel);document.body.appendChild(backdrop);
