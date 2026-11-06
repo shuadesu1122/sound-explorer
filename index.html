@@ -843,7 +843,7 @@ function createWave(v){
  return {out,sr,duration,rms};
 }
 function stopSound(){spectrumFinished=true;animating=false;cancelAnimationFrame(animationId);voices.forEach(v=>{try{v.stop()}catch(e){}});voices=[];renderGraphs()}async function playSound(v=vals){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();stopSound();spectrumFinished=false;let w=createWave(v),buf=audioCtx.createBuffer(1,w.out.length,w.sr);buf.copyToChannel(w.out,0);let src=audioCtx.createBufferSource(),gain=audioCtx.createGain();src.buffer=buf;let limiter=audioCtx.createDynamicsCompressor();limiter.threshold.value=-21;limiter.knee.value=12;limiter.ratio.value=4;limiter.attack.value=.008;limiter.release.value=.2;src.connect(gain).connect(limiter).connect(audioCtx.destination);gain.gain.value=.52;src.start();voices=[src];lastWave=w;lastWavePosition=0;playStart=performance.now();startGraphAnimation();src.onended=()=>{voices=voices.filter(x=>x!==src);if(!voices.length){animating=false;spectrumFinished=true;renderGraphs()}}}catch(e){alert('音声を再生できませんでした: '+e.message)}}$('play').onclick=()=>playSound();$('stop').onclick=stopSound;
-// Export the synthesized note, through the same gain/compressor chain as playback.
+// Export the synthesized note as 16-bit PCM WAV; offer native sharing on mobile.
 // OfflineAudioContext resamples the 16 kHz synthesis buffer to 44.1 kHz.
 async function exportWav(){
  const button=$('exportWav');if(button.disabled)return;
@@ -878,12 +878,26 @@ async function exportWav(){
   const selected=$('note').selectedOptions[0]?.textContent||'Note';
   const noteName=selected.replace(/♯/g,'sharp').replace(/[^a-zA-Z0-9_-]/g,'');
   const filename='SoundExplorer_'+noteName+'.wav';
-  // Download directly on desktop and mobile browsers; avoid unexpected share sheets.
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement('a');
-  link.href=url;link.download=filename;link.style.display='none';
-  document.body.appendChild(link);link.click();link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  // Prefer the native iOS/Android share sheet, including "Save to Files".
+  // Web Share requires HTTPS and a user gesture; fall back to a direct WAV download.
+  const file=new File([blob],filename,{type:'audio/wav'});
+  let shared=false;
+  if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+   try{
+    await navigator.share({files:[file]});
+    shared=true;
+   }catch(shareError){
+    if(shareError.name==='AbortError')return; // User closed the share sheet.
+    // Other errors fall back to browser download.
+   }
+  }
+  if(!shared){
+   const url=URL.createObjectURL(blob);
+   const link=document.createElement('a');
+   link.href=url;link.download=filename;link.style.display='none';
+   document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }
  }catch(error){alert('WAV作成に失敗しました: '+error.message)}
  finally{button.disabled=false;button.textContent='WAV保存'}
 }
