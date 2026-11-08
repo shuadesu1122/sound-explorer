@@ -803,6 +803,9 @@ input[type=range]{height:21px}
 .transport .note{grid-column:3!important;justify-self:center!important}
 .transport #exportWav{grid-column:4!important;justify-self:center!important}
 @media(max-width:360px){.transport .playControls button{width:32px!important;height:32px!important;min-width:32px!important}.transport .playControls{gap:3px!important}}
+
+/* Shift the entire visible app down by exactly 2mm without resizing its layout. */
+main.app{transform:translateY(2mm);}
 </style><style>
 /* FORMULAS only: concise permanent notation key, no scrolling. */
 #paramList.formulaPanel .formulaSingle{gap:clamp(3px,.65dvh,7px)!important;}
