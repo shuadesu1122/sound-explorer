@@ -799,6 +799,16 @@ input[type=range]{height:21px}
 #paramList.formulaPanel .formulaSubstitution .mathfrac{font-size:.82em;white-space:nowrap;}
 #paramList.formulaPanel .formulaSingleEq{font-size:clamp(16px,4.3vw,20px)!important;}
 #paramList.formulaPanel .formulaResult{font-size:clamp(18px,4.8vw,22px)!important;}
+
+/* Center controls consistently; five visible tabs use five equal columns. */
+.tabs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;width:100%!important;gap:0!important;overflow:visible!important}
+.tabs .tab{width:100%!important;min-width:0!important;text-align:center!important}
+.transport{width:100%!important;max-width:none!important;grid-template-columns:minmax(82px,1.25fr) repeat(3,minmax(0,1fr))!important;column-gap:4px!important;justify-items:center!important;padding:0 3px!important}
+.transport .playControls{grid-column:1!important;justify-self:center!important;justify-content:center!important;width:100%!important;gap:4px!important}
+.transport #soundPreset{grid-column:2!important;justify-self:center!important}
+.transport .note{grid-column:3!important;justify-self:center!important}
+.transport #exportWav{grid-column:4!important;justify-self:center!important}
+@media(max-width:360px){.transport .playControls button{width:32px!important;height:32px!important;min-width:32px!important}.transport .playControls{gap:3px!important}}
 </style><style>
 /* FORMULAS only: concise permanent notation key, no scrolling. */
 #paramList.formulaPanel .formulaSingle{gap:clamp(3px,.65dvh,7px)!important;}
