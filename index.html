@@ -903,6 +903,69 @@ input[type=range]{height:21px}
 @media (max-width:600px) and (max-height:680px){
  .app{--equal-panel-height:clamp(250px,39dvh,285px)!important;}
 }
+
+/* Single viewport layout: all six parameter panels have exactly the same
+   available height, regardless of their content. No panel/page scrolling. */
+@media (max-width:600px){
+ html,body{height:100%!important;overflow:hidden!important;overscroll-behavior:none!important}
+ .app{height:100dvh!important;max-height:100dvh!important;min-height:0!important;
+   box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
+   overflow:hidden!important;gap:clamp(4px,.65dvh,7px)!important;
+   padding:calc(7px + env(safe-area-inset-top)) 10px calc(8px + env(safe-area-inset-bottom))!important;
+   --equal-panel-height:unset!important;}
+ .heading{flex:0 0 auto!important;min-height:0!important}
+ .heading h1{font-size:clamp(30px,8vw,40px)!important}
+ .graphs{height:auto!important;flex:1 1 0!important;min-height:80px!important;max-height:none!important;overflow:hidden!important;
+   grid-template-rows:minmax(0,1.22fr) minmax(0,1fr)!important}
+ .mainGraph,.subs,.sub{min-height:0!important;overflow:hidden!important}
+ .transport{flex:0 0 44px!important;min-height:44px!important;max-height:44px!important}
+ .tabs{flex:0 0 auto!important;min-height:0!important}
+ .params:not(:has(#paramList.comparePanel)),.params:has(#paramList.formulaPanel){
+   flex:0 0 clamp(280px,39dvh,345px)!important;
+   height:clamp(280px,39dvh,345px)!important;
+   min-height:0!important;max-height:clamp(280px,39dvh,345px)!important;
+   box-sizing:border-box!important;overflow:hidden!important;
+   border:1px solid #bcbcb8!important;display:flex!important;flex-direction:column!important;
+ }
+ .params:not(:has(#paramList.comparePanel)) > .paramTop{flex:0 0 auto!important}
+ .params:not(:has(#paramList.comparePanel)) > .paramList{
+   flex:1 1 0!important;height:auto!important;min-height:0!important;max-height:none!important;
+   overflow:hidden!important;overscroll-behavior:none!important;
+ }
+ .params:not(:has(#paramList.comparePanel)) > .paramList:not(.formulaPanel){
+   display:flex!important;flex-direction:column!important;justify-content:space-evenly!important;
+   gap:clamp(2px,.4dvh,5px)!important;
+ }
+ .params:not(:has(#paramList.comparePanel)) > .paramList:not(.formulaPanel) .param{
+   flex:0 1 auto!important;min-height:0!important;
+ }
+ #paramList.formulaPanel{overflow:hidden!important;padding:0!important}
+ #paramList.formulaPanel .formulaMotion{
+   box-sizing:border-box!important;height:100%!important;min-height:0!important;
+   display:flex!important;flex-direction:column!important;justify-content:space-evenly!important;
+   gap:clamp(3px,.65dvh,7px)!important;padding:3px 6px!important;overflow:hidden!important;
+ }
+ #paramList.formulaPanel .formulaSingleTitle{font-size:clamp(17px,4.6vw,21px)!important}
+ #paramList.formulaPanel .formulaPurpose{font-size:clamp(17px,4.6vw,21px)!important}
+ #paramList.formulaPanel .formulaSource{font-size:clamp(12px,3.4vw,15px)!important}
+ #paramList.formulaPanel .formulaSingleEq{font-size:clamp(21px,5.7vw,27px)!important;
+   line-height:1.35!important;max-height:none!important;padding:5px 7px!important;overflow-wrap:anywhere!important}
+ #paramList.formulaPanel .formulaSubstitution{font-size:clamp(19px,5.1vw,24px)!important;
+   line-height:1.4!important;max-height:none!important;overflow-wrap:anywhere!important}
+ #paramList.formulaPanel .formulaResult{font-size:clamp(23px,6.2vw,29px)!important}
+ #paramList.formulaPanel .formulaCalcLabel{font-size:clamp(12px,3.5vw,15px)!important;margin-top:0!important}
+ #paramList.formulaPanel .formulaSingleCount{margin-top:0!important;font-size:11px!important}
+}
+@media (max-width:600px) and (max-height:720px){
+ .app{gap:3px!important;padding-top:calc(5px + env(safe-area-inset-top))!important;padding-bottom:calc(5px + env(safe-area-inset-bottom))!important}
+ .heading h1{font-size:30px!important}
+ .transport{flex-basis:40px!important;min-height:40px!important;max-height:40px!important}
+ .params:not(:has(#paramList.comparePanel)),.params:has(#paramList.formulaPanel){
+   height:clamp(245px,38dvh,285px)!important;max-height:clamp(245px,38dvh,285px)!important;
+   flex-basis:clamp(245px,38dvh,285px)!important}
+ #paramList.formulaPanel .formulaSingleEq{font-size:clamp(19px,5.2vw,24px)!important}
+ #paramList.formulaPanel .formulaSubstitution{font-size:clamp(18px,4.9vw,22px)!important}
+}
 </style><style>
 /* FORMULAS only: concise permanent notation key, no scrolling. */
 #paramList.formulaPanel .formulaSingle{gap:clamp(3px,.65dvh,7px)!important;}
