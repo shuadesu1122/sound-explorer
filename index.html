@@ -817,6 +817,32 @@ input[type=range]{height:21px}
     overflow-y:auto!important;
   }
 }
+
+/* vNext: balanced transport and matched, fully visible lower frames. */
+@media(max-width:600px){
+ .app{transform:none!important; height:100dvh!important; padding-top:calc(9px + env(safe-area-inset-top))!important; padding-bottom:calc(12px + env(safe-area-inset-bottom))!important; gap:clamp(5px,.8dvh,8px)!important;}
+ .graphs{height:auto!important;min-height:0!important;flex:1 1 auto!important;max-height:40dvh!important;grid-template-rows:minmax(0,1.25fr) minmax(0,1fr)!important;}
+ .transport{flex:0 0 46px!important;min-height:46px!important;grid-template-columns:1.3fr 1fr .9fr 1.1fr!important;gap:5px!important;padding:0 3px!important;}
+ .transport .playControls{gap:5px!important;}
+ .transport .playControls button{width:clamp(33px,9vw,39px)!important;height:clamp(33px,9vw,39px)!important;min-width:0!important;flex:0 0 auto!important;}
+ .transport #soundPreset,.transport .note{font-size:clamp(11px,3vw,13px)!important;}
+ .transport #exportWav{font-size:clamp(9px,2.6vw,11px)!important;padding:9px 3px!important;}
+ .params:not(:has(.comparePanel)){
+   height:clamp(245px,34dvh,315px)!important;
+   min-height:0!important;
+   max-height:clamp(245px,34dvh,315px)!important;
+   flex:0 0 clamp(245px,34dvh,315px)!important;
+   border:1px solid #bcbcb8!important;
+   overflow:hidden!important;
+ }
+ .params:not(:has(.comparePanel)) > .paramList{min-height:0!important;overflow-y:auto!important;}
+ #paramList.formulaPanel{overflow-y:auto!important;}
+ #paramList.formulaPanel .formulaMotion{height:auto!important;min-height:100%!important;overflow:visible!important;}
+}
+@media(max-width:600px) and (max-height:680px){
+ .params:not(:has(.comparePanel)){height:clamp(215px,33dvh,245px)!important;max-height:clamp(215px,33dvh,245px)!important;flex-basis:clamp(215px,33dvh,245px)!important;}
+ .transport{flex-basis:41px!important;min-height:41px!important;}
+}
 </style><style>
 /* FORMULAS only: concise permanent notation key, no scrolling. */
 #paramList.formulaPanel .formulaSingle{gap:clamp(3px,.65dvh,7px)!important;}
@@ -2099,42 +2125,5 @@ tabs();renderParams();renderSlots();$('graph0').parentElement.classList.add('rea
 
 
 </script>
-<script>
-/* Center the A4 selector against the visible mobile viewport, not the document. */
-(function(){
- const graph=document.querySelector('.graphs');
- const note=document.getElementById('note');
- if(!graph||!note)return;
- let raf=0;
- function alignPitch(){
-  if(window.innerWidth>600){graph.style.removeProperty('--centered-graph-height');return;}
-  // Reset first: repeated viewport resize must not accumulate height changes.
-  graph.style.removeProperty('--centered-graph-height');
-  const base=graph.getBoundingClientRect().height;
-  const r=note.getBoundingClientRect();
-  const vv=window.visualViewport;
-  const center=(vv?vv.offsetTop+vv.height/2:window.innerHeight/2)+4;
-  const noteCenter=r.top+r.height/2;
-  // Increasing graph height moves the following transport (and its note) down.
-  const desired=Math.max(160,base+center-noteCenter);
-  graph.style.setProperty('--centered-graph-height',desired+'px');
-  // A layout pass can change flex sizing; correct for the measured residual.
-  requestAnimationFrame(()=>{
-   const actual=note.getBoundingClientRect();
-   const residual=center-(actual.top+actual.height/2);
-   if(Math.abs(residual)>0.75){
-    const h=graph.getBoundingClientRect().height;
-    graph.style.setProperty('--centered-graph-height',Math.max(160,h+residual)+'px');
-   }
-   if(typeof renderGraphs==='function')renderGraphs();
-  });
- }
- function schedule(){cancelAnimationFrame(raf);raf=requestAnimationFrame(alignPitch)}
- window.addEventListener('load',schedule);
- window.addEventListener('resize',schedule);
- window.visualViewport?.addEventListener('resize',schedule);
- window.visualViewport?.addEventListener('scroll',schedule);
- schedule();
-})();
-</script>
+
 </body></html>
