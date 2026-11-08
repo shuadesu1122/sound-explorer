@@ -799,6 +799,29 @@ input[type=range]{height:21px}
 #paramList.formulaPanel .formulaSubstitution .mathfrac{font-size:.82em;white-space:nowrap;}
 #paramList.formulaPanel .formulaSingleEq{font-size:clamp(16px,4.3vw,20px)!important;}
 #paramList.formulaPanel .formulaResult{font-size:clamp(18px,4.8vw,22px)!important;}
+
+/* Reference screenshot: restore the frame proportions and keep the lower border visible. */
+@media (max-width:600px){
+ html,body{height:100%;overflow:hidden!important}
+ .app{height:100dvh!important;min-height:0!important;transform:none!important;display:flex!important;flex-direction:column!important;gap:clamp(5px,.8dvh,9px)!important;padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom))!important;overflow:hidden!important}
+ .heading{flex:0 0 auto!important;padding-bottom:6px!important}
+ .heading h1{font-size:clamp(30px,7.8vw,39px)!important;line-height:1.1!important}
+ .graphs{height:36dvh!important;min-height:0!important;flex:0 0 36dvh!important;grid-template-rows:minmax(0,1.25fr) minmax(0,1fr)!important;gap:8px!important}
+ .mainGraph,.sub{min-height:0!important;overflow:hidden!important}
+ .subs{height:100%!important;min-height:0!important;gap:9px!important}
+ .transport{min-height:42px!important;flex:0 0 42px!important}
+ .transport .playControls button{width:38px!important;height:38px!important;min-width:38px!important}
+ .transport #soundPreset,.transport .note{font-size:13px!important}
+ .tabs{flex:0 0 auto!important}
+ .tabs .tab{font-size:clamp(8px,1.9vw,10px)!important;padding-top:9px!important;padding-bottom:9px!important}
+ .params,.params:has(#paramList.formulaPanel){height:auto!important;flex:1 1 0!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:9px 10px 10px!important;border:1px solid #bcbcb8!important;display:flex!important;flex-direction:column!important}
+ .paramTop{flex:0 0 25px!important;height:25px!important;min-height:25px!important;margin-bottom:7px!important}
+ .paramList:not(.comparePanel):not(.formulaPanel){flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;justify-content:space-around!important;gap:4px!important}
+ .paramList:not(.comparePanel):not(.formulaPanel) .param{flex:0 0 auto!important}
+ #paramList.formulaPanel{flex:1 1 0!important;min-height:0!important;height:auto!important;overflow:hidden!important}
+ #paramList.formulaPanel .formulaMotion{height:100%!important;min-height:0!important;justify-content:flex-start!important;overflow:hidden!important}
+}
+@media(max-width:600px) and (max-height:650px){.graphs{height:33dvh!important;flex-basis:33dvh!important}.heading h1{font-size:30px!important}}
 </style><style>
 /* FORMULAS only: concise permanent notation key, no scrolling. */
 #paramList.formulaPanel .formulaSingle{gap:clamp(3px,.65dvh,7px)!important;}
